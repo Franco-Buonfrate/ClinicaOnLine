@@ -1,0 +1,38 @@
+
+<div
+  class="bg-image"
+  style="
+    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
+    height: 94vh;
+    display: grid;
+  ">
+    <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
+
+        <div class="bg-success bg-opacity-50 "> 
+                <ul class="contenedor-tabs">
+                    <li class="tab tab-segunda" [class.active]="menuSeleccionado === 0"><a (click)="onValueChange(0)">Usuarios</a></li>
+                    <li class="tab tab-primera" [class.active]="menuSeleccionado === 1"><a (click)="onValueChange(1)">Registro</a></li>
+                </ul>
+        </div>
+
+        <div *ngIf="menuSeleccionado === 0">
+            <h1>Especialistas</h1>
+            <div class="contenedor-formularios d-flex flex-column align-items-center text-white" *ngFor="let especialista of listaEspecialistas">
+                <h2>Especialista en  {{especialista.especialidad}}</h2>
+                <h4>Nombre: {{especialista.nombre}} {{especialista.apellido}}</h4>
+                <h4>DNI: {{especialista.dni}}</h4>
+                <h4>Estado actual: {{especialista.estado}}</h4>
+    
+                <div >
+                    <br>
+                    <button class="btn btn-success btn-lg" (click)="cambiarEstado(especialista.uid, 'habilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'desabilitado'">Habilitar</button>
+                    <button class="btn btn-danger btn-lg" (click)="cambiarEstado(especialista.uid, 'desabilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'habilitado'">Desabilitar</button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="menuSeleccionado === 1">
+            <app-register [Admin]="true"></app-register>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,27 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark" style="padding-right: 15px;">
+  <a class="navbar-brand" href="/home">
+    <img src="../assets/logo.png" width="40" height="30" class="d-inline-block align-top" alt="">
+    Clinica OnLine
+  </a>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/home">Home</a>
+      <a class="nav-item nav-link" href="/usuarios">Usuarios</a>
+    </div>
+  </div>
+  
+  <div class="col-md-3 text-end">
+    <ng-container *ngIf="estaLogueado; else showLoginButton">
+      <button type="button" class="btn btn-primary" routerLink="bienvenido" (click)="logOut()">Salir</button>
+    </ng-container>
+    
+    <ng-template #showLoginButton >
+      <div >
+        <button style="margin-right: 15px; width: 110px;" type="button" class="btn btn-primary" routerLink="register" >Registrarse</button>
+        <button style="width: 110px" type="button" class="btn btn-outline-primary me-2" routerLink="login">Ingresar</button>
+      </div>
+    </ng-template>
+  </div>
+</nav>
+<router-outlet></router-outlet>

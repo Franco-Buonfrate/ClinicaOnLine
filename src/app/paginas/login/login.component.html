@@ -1,0 +1,46 @@
+<div
+  class="bg-image"
+  style="
+    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
+    height: 94vh;
+    display: grid;
+  ">
+  <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
+
+<div class="contenedor-formularios">
+    <div >
+        <!-- Iniciar Sesion -->
+        
+        <div>
+            <h1>Iniciar sesion</h1>
+            <form (ngSubmit)="onLoginSubmit()">
+
+                <div class="contenedor-input">
+                    <input 
+                        type="text" 
+                        placeholder="Mail"
+                        required
+                        formControlName="mail"
+                        [class.invalid-input]="formEnviado && formularioLogin.get('mail')?.invalid"
+                    >
+                </div>
+
+                <div class="contenedor-input">
+                    <input 
+                        type="text" 
+                        placeholder="Contraseña"
+                        required
+                        formControlName="contrasenia"
+                        [class.invalid-input]="formEnviado && formularioLogin.get('contrasenia')?.invalid"
+                    >
+                </div>
+                
+                <input type="submit" class="button button-block" value="Ingresar">
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
