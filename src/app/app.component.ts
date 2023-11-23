@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Router } from '@angular/router';
+import { AuthService } from './servicios/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -8,17 +10,22 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 })
 export class AppComponent {
   title = 'TpClinicaLabo4';
-  estaLogueado!:boolean;
+  estaLogueado:boolean = false;
+  usuario:any;
 
-  constructor(private auth:AngularFireAuth) {
-    this.auth.authState.subscribe(user => {
-      this.estaLogueado = !!user;
+  constructor(private auth:AuthService, public router: Router) {
+
+    this.auth.estaLogueado().subscribe((usuarioActual)=>{
+      this.estaLogueado=usuarioActual?true:false;
+      this.usuario = usuarioActual;
     });
+
   }
 
   async logOut()
   {
-    await this.auth.signOut();
-    this.estaLogueado = true;
+    this.auth.logout();
+    this.estaLogueado = false;
+    this.router.navigate(['home']);
   }
 }

@@ -2,47 +2,49 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
-import { collection } from 'firebase/firestore';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private angularFireAuth:AngularFireAuth, private firestore: AngularFirestore, private router: Router) { }
+  public usuarioActual:any = null;
+  private usuarioActualSubject: Subject<any> = new Subject<any>();
+  
+  constructor(
+    private angularFireAuth:AngularFireAuth, 
+    private firestore: AngularFirestore, 
+    private router: Router
+  ) { }
 
-  async register(formulario:any, coleccion:string)
+  async register(formulario:any, tipo:string)
   {
     try
     {
-      let uidUsuarioActual:any = null;
-
-      this.angularFireAuth.user.subscribe((user) => {
-        uidUsuarioActual = user?.uid.toString();
-      });
-    
-      await this.angularFireAuth.createUserWithEmailAndPassword(formulario.mail, formulario.contrasenia).then((user) => {
+      this.angularFireAuth.createUserWithEmailAndPassword(formulario.mail, formulario.contrasenia).then((user) => {
         formulario = {
           ...formulario,
           uid : user.user?.uid,
           estado: 'pendiente-habilitacion',
-          tipo: coleccion
+          tipo: tipo,
+          turnos: []
         }
-        this.firestore.collection(coleccion).doc(user.user?.uid).set(formulario);
 
+        this.firestore.collection('usuarios').doc(user.user?.uid).set(formulario);
 
+        if(this.usuarioActual != null)
+        {
+          this.angularFireAuth.signOut();
+          //this.angularFireAuth.updateCurrentUser(this.usuarioActual);
+          console.log('cambio de usuario');
+        }
+        else
+        {
+          this.usuarioActual = formulario; 
+          this.usuarioActualSubject.next(this.usuarioActual);
+        }
       });
-
-      console.log(uidUsuarioActual);
-      
-      if(uidUsuarioActual != null)
-      {
-        this.angularFireAuth.signOut();
-        this.firestore.collection('admins').doc(uidUsuarioActual).valueChanges().subscribe((user:any) => {
-          this.angularFireAuth.signInWithEmailAndPassword(user?.mail, user?.contrasenia);
-        });
-
-      }
     }
     catch(err){
       console.log(err);
@@ -51,30 +53,54 @@ export class AuthService {
 
   async login(mail:string, pass: string){
     await this.angularFireAuth.signInWithEmailAndPassword(mail, pass).then((user) => {
+      this.angularFireAuth.currentUser.then((a)=> {
+        const sub = this.firestore.collection('usuarios').doc(a?.uid).valueChanges().subscribe((b:any)=>{
+          this.usuarioActual = b;
+          this.usuarioActualSubject.next(this.usuarioActual); 
+          sub.unsubscribe();
+        });
+      });
       this.router.navigate(['home']);
     });
   } 
 
-  esAdmin(): boolean{
-    let uidUsuarioActual:any = null;
-    let tipoUsuarioActual:any = null;
-    this.angularFireAuth.user.subscribe((user) => {
-      uidUsuarioActual = user?.uid.toString();
-    });
+  async logout(){
+    this.usuarioActual = null;
+    this.usuarioActualSubject.next(this.usuarioActual);
+    this.angularFireAuth.signOut();
+  }
 
-    if(uidUsuarioActual != null)
+  estaLogueado(): Observable<any> {
+    return this.usuarioActualSubject.asObservable();
+  }
+
+  esAdmin():boolean{
+  let uidUsuarioActual:any = null;
+  let tipoUsuarioActual:any = null;
+
+    new Promise((resolve) => {
+    this.angularFireAuth.user.subscribe((user) => {
+      console.log(user?.uid);
+      resolve(user?.uid.toString());      
+    });
+  }).then((uid) => {
+    console.log(uid);
+    if(uid != null)
     {
-      this.firestore.collection('admins').doc(uidUsuarioActual).valueChanges().subscribe((user:any) => {
+      this.firestore.collection('admins').doc(uidUsuarioActual).valueChanges().subscribe((user: any) => {
         tipoUsuarioActual = user?.tipo;
       });
     }
 
-    if(tipoUsuarioActual === 'administrador'){
-      return true;
-    }
-    else{
-      return false;
-    }
+  });    
+  if(tipoUsuarioActual === 'admin'){
+    return true;
   }
+  else{
+    return false;
+  }
+
+
+}
 
 }

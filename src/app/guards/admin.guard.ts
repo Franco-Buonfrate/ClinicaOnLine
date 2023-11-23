@@ -19,12 +19,13 @@ export class AdminGuard implements CanActivate {
   canActivate(
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+
     return this.afAuth.authState.pipe(
       take(1),
       map(user => !!user && this.authService.esAdmin()),
-      tap(isAdmin => {
-        if (!isAdmin) {
-          this.router.navigate([route]); // Redirige al usuario a la página principal si no es un administrador
+      tap(esAdmin => {
+        if (!esAdmin) {
+          this.router.navigate(['/home']); 
           Swal.fire({
             title: 'Error',
             text: 'Debe ser administrador para ingresar',

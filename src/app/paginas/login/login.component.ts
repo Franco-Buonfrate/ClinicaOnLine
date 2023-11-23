@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/servicios/auth.service';
+import {MDCRipple} from '@material/ripple';
 
 @Component({
   selector: 'app-login',
@@ -8,6 +9,7 @@ import { AuthService } from 'src/app/servicios/auth.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+
   formEnviado: boolean = false;
   formularioLogin: FormGroup;
   constructor(private formBuilder: FormBuilder, private auth:AuthService) {
@@ -23,5 +25,11 @@ export class LoginComponent {
     { 
       this.auth.login(this.formularioLogin.get('mail')?.value, this.formularioLogin.get('contrasenia')?.value);
     }
+  }
+
+  clickListadoUsuarios($event :any){
+    this.formularioLogin.get('mail')?.setValue($event.mail);
+    this.formularioLogin.get('contrasenia')?.setValue($event.contrasenia);
+
   }
 }

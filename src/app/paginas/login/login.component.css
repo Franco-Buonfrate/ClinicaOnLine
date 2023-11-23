@@ -186,3 +186,9 @@
   .invalid-input{
     border-color: #fd0000;
   }
+
+  .position-acceso-buttons{
+    align-items: flex-end;
+    flex-wrap: wrap;
+    flex-direction: column;
+  }

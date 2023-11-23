@@ -1,13 +1,13 @@
-<div
-  class="bg-image"
-  style="
-    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
-    height: 110vh;
-    display: grid;
-  ">
-  <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
+<div *ngIf="tipoFormulario === -1">
+    <div class="contenedor-formularios d-flex flex-column align-items-center text-white" (click)="cambioFormulario(0)">
+        <img style="height: 15vh;" src="../../../assets/paciente.png">
+    </div>
+    <div class="contenedor-formularios d-flex flex-column align-items-center text-white" (click)="cambioFormulario(1)">
+        <img style="height: 15vh;" src="../../../assets/medico.png">
+    </div>
+</div>
 
-<div class="contenedor-formularios">
+<div class="contenedor-formularios" *ngIf="tipoFormulario != -1">
     <!-- Links de los formularios -->
     <ul class="contenedor-tabs" *ngIf="!Admin">
         <li class="tab" [class.active]="tipoFormulario === 0"><a (click)="cambioFormulario(0)">Paciente</a></li>
@@ -184,8 +184,7 @@
                 </div>
 
                 <!-- Especialidad -->
-                <div class="contenedor-input">
-                    <input 
+                    <!-- <input 
                         list="datalistOptions" 
                         placeholder="Especialidad"
                         required
@@ -194,16 +193,36 @@
                     >
 
                     <datalist id="datalistOptions">
-                        <option value="San Francisco">
-                        <option value="New York">
-                        <option value="Seattle">
-                        <option value="Los Angeles">
-                        <option value="Chicago">
-                    </datalist>
+                        <option value="Cardiologia">
+                        <option value="Neurologia">
+                        <option value="Dermatologia">
+                        <option value="Traumatologia">
+                        <option value="Analisis Clinico">
+                    </datalist> -->
+                <div class="fila-arriba">
+                    <div class="contenedor-input">
+                        <mat-form-field style="background-color: #ffffff00 important; ">
+                            <mat-label>Especialidades</mat-label>
+                            <mat-select formControlName="especialidades" multiple>
+                                
+                            <mat-option *ngFor="let esp of especialidades" [value]="esp">{{esp}}</mat-option>
+    
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="contenedor-input">
+                        
+                        <input placeholder="Agregar especialidad" matInput type="text" #especialidadInput>
+
+                        <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="agregarEspecialidad(especialidadInput.value)">
+                        <mat-icon style="color: white;" fontIcon="arrow_upward"></mat-icon>
+                        </button>
+
+                    </div>
                 </div>
 
                  <!-- Mail -->
-                 <div class="contenedor-input">
+                <div class="contenedor-input">
                     <input 
                         type="email" 
                         placeholder="Mail" 
@@ -327,7 +346,6 @@
         </div>
     </div>
 </div>
-</div>
-</div>
+
 
 

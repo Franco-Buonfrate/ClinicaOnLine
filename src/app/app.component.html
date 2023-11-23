@@ -1,19 +1,24 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark" style="padding-right: 15px;">
-  <a class="navbar-brand" href="/home">
+  <a class="navbar-brand" (click)="this.router.navigate(['home'])">
     <img src="../assets/logo.png" width="40" height="30" class="d-inline-block align-top" alt="">
     Clinica OnLine
   </a>
 
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="/home">Home</a>
-      <a class="nav-item nav-link" href="/usuarios">Usuarios</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['home'])">Home</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['usuarios'])">Usuarios</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['solicitarTurno'])" >Solicitar turno</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['misTurnos'])" >Mis Turnos</a>
+
     </div>
   </div>
   
   <div class="col-md-3 text-end">
     <ng-container *ngIf="estaLogueado; else showLoginButton">
-      <button type="button" class="btn btn-primary" routerLink="bienvenido" (click)="logOut()">Salir</button>
+      <!-- <button type="button" class="btn btn-primary" (click)="logOut()">Salir</button> -->
+      <button style="margin-right: 15px; width: 110px;" type="button" class="btn btn-primary" routerLink="miPerfil">Mi perfil</button>
+      <button style="width: 110px" type="button" class="btn btn-outline-primary me-2"  (click)="logOut()">Salir</button>
     </ng-container>
     
     <ng-template #showLoginButton >
@@ -24,4 +29,17 @@
     </ng-template>
   </div>
 </nav>
-<router-outlet></router-outlet>
+
+<div
+  class="bg-image"
+  style="
+    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
+    height: 94vh;
+    display: grid;
+  ">
+  <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
+
+    <router-outlet></router-outlet>
+
+  </div>
+</div>

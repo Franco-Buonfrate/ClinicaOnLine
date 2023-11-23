@@ -1,11 +1,3 @@
-<div
-  class="bg-image"
-  style="
-    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
-    height: 94vh;
-    display: grid;
-  ">
-  <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
 
 <div class="contenedor-formularios">
     <div >
@@ -13,7 +5,7 @@
         
         <div>
             <h1>Iniciar sesion</h1>
-            <form (ngSubmit)="onLoginSubmit()">
+            <form [formGroup]="formularioLogin" (ngSubmit)="onLoginSubmit()">
 
                 <div class="contenedor-input">
                     <input 
@@ -39,8 +31,12 @@
             </form>
         </div>
     </div>
+
+    
 </div>
-</div>
-</div>
+    <div class="position-acceso-buttons d-flex gradient-custom-2 text-center">
+        <app-botones-login (botonUsuarios)="clickListadoUsuarios($event)"></app-botones-login>
+    </div>
+
 
 

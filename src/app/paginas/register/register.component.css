@@ -186,3 +186,9 @@
   .invalid-input{
     border-color: #fd0000;
   }
+
+
+
+  .dropup .hide-toggle.dropdown-toggle::after {
+    display: none !important;
+  }

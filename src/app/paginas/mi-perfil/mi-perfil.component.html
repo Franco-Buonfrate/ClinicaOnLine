@@ -1,0 +1,95 @@
+<!-- PACIENTE -->
+
+<div class="contenedor-formularios" *ngIf="tipoUsuario === 'paciente'">
+    <h3 class="text-white">Mi Perfil</h3>
+    <div style="display: flex; justify-content: center">
+      <img class="img-perfil" src="{{usuario.foto1}}" alt="imagen 1" />
+      <img class="img-perfil"  src="{{ usuario.foto2 }}" alt="imagen 2"/>
+    </div>
+    <div class="row" >
+        <div class="col text-white">
+          <label>Nombre</label>
+          <p>{{ usuario?.nombre }}</p>
+          <label>Apellido</label>
+          <p>{{ usuario?.apellido }}</p>
+          <label>Edad</label>
+          <p>{{ usuario?.edad }} años</p>
+          <label>DNI</label>
+          <p>{{ usuario?.dni }}</p>
+        </div>
+        <div class="col text-white">
+          <label>Correo</label>
+          <p>{{ usuario?.mail }}</p>
+          <label>Obra Social</label>
+          <p>{{ usuario?.obraSocial }}</p>
+          <label>Perfil</label>
+          <p>Paciente</p>
+          <label>Historial Clínico</label>
+          <br/>
+        </div>
+      </div>
+</div>
+
+<!-- ESPECIALISTA -->
+<div class="contenedor-formularios" *ngIf="tipoUsuario === 'especialista'">
+  <h3 class="text-white">Mi Perfil</h3>
+  <div style="display: flex; justify-content: center">
+    <img class="img-perfil" src="{{usuario.foto}}" />
+  </div>
+  <div class="row">
+    <div class="col col-3 text-white" >
+      <label>Nombre</label>
+      <p>{{ usuario?.nombre }}</p>
+      <label>Apellido</label>
+      <p>{{ usuario?.apellido }}</p>
+      <label>Edad</label>
+      <p>{{ usuario?.edad }} años</p>
+      <label>DNI</label>
+      <p>{{ usuario?.dni }}</p>
+    </div>
+    <div class="col col-4 text-white">
+      <label>Correo</label>
+      <p>{{ usuario?.mail }}</p>
+      <label>Especialidades</label>
+      <p *ngFor="let esp of usuario.especialidades" style="margin-bottom: 0;">{{esp.tipo}}</p>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+
+      <mat-form-field>
+        <mat-label>Especialidad</mat-label>
+        <mat-select [(value)]="espSeleccionada">
+          <mat-option *ngFor="let esp of listaEspecialidades" [value]="esp">{{ esp.tipo }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+        <div style="display: flex; justify-content: center;">
+          <button *ngFor="let boton of botonesDias" class="btn btn-success dias-button" [ngClass]="obtenerClaseDia(boton.numero)" (click)="agregarDia(boton.numero)">{{boton.dia}}</button>
+        </div>
+        <button class="btn btn-info btn-block" style="margin-top: 30px; width: 220px;" (click)="actualizarCalendario()">Subir calendario</button>
+
+    </div>
+</div>
+</div>
+
+<!-- ADMINISTRADOR -->
+
+<div class="contenedor-formularios" *ngIf="tipoUsuario === 'admin'">
+  <div class="row" >
+    <div class="col">
+      <label>Nombre</label>
+      <p>{{ usuario?.nombre }}</p>
+      <label>Apellido</label>
+      <p>{{ usuario?.apellido }}</p>
+      <label>Edad</label>
+      <p>{{ usuario?.edad }} años</p>
+    </div>
+    <div class="col">
+      <label>DNI</label>
+      <p>{{ usuario?.dni }}</p>
+      <label>Correo</label>
+      <p>{{ usuario?.mail }}</p>
+      <label>Tipo de Usuario</label>
+      <p>Administrador</p>
+    </div>
+  </div>
+</div>

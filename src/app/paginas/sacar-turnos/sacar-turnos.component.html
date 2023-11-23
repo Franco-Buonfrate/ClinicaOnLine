@@ -1,0 +1,119 @@
+<div class="contenedor-formularios">
+
+    <!-- <mat-accordion class="example-headers-align" >
+      <mat-expansion-panel *ngFor="let especialista of listaEspecialistas" (expandedChange)="limpiar(especialista)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{especialista.nombre}} {{especialista.apellido}}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{especialista.especialidad}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <mat-form-field class="example-full-width">
+                <mat-label>Seleccione una fecha</mat-label>
+                <input disabled matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" (dateChange)="especialista.nuevoTurno = $event.value">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker disabled="false"></mat-datepicker>
+              </mat-form-field>
+      
+              <br>
+      
+              <div style="display: flex; flex-wrap: wrap; justify-content: center;" >
+                <button 
+                mat-raised-button 
+                style="width: 80px;" 
+                *ngFor="let boton of listaBotones"
+                (click)="seleccionarBoton(boton)"
+                [class.selected]="boton === botonSeleccionado"
+                [disabled]="esTurnoAsignado(boton, especialista)"
+                > 
+                    {{boton}} 
+                </button>
+              </div>
+      
+            </div>
+            <br>
+            <div style="display: flex;justify-content: flex-end;">
+              <button 
+              mat-raised-button 
+              style="background-color: #1ab188;" 
+              [disabled]="!fechaSeleccionada || !botonSeleccionado"
+              (click)="confirmarTurno(especialista)">
+                Confirmar Turno
+              </button>
+            </div>
+      </mat-expansion-panel>
+    </mat-accordion> -->
+  
+    <!-- <mat-accordion class="example-headers-align" >
+      <mat-expansion-panel *ngFor="let especialidad of listaEspecialidades" >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{especialidad}}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="list-group">
+          <button *ngFor="let especialista of listarPorEspecialidad(especialidad)"  type="button" class="list-group-item list-group-item-action list-group-item-dark">{{especialista.nombre}} {{especialista.apellido}}</button>
+        </div>
+
+
+
+      </mat-expansion-panel>
+    </mat-accordion> -->
+
+
+
+    <div class="list-group" *ngIf="!especialidadSeleccionada">
+      <a *ngFor="let especialidad of listaEspecialidades" class="list-group-item list-group-item-action list-group-item-dark" (click)="seleccionarEspecialidad(especialidad)">{{especialidad}}</a>
+    </div>
+
+    <div class="list-group" *ngIf="especialidadSeleccionada && !especialistaSeleccionado">
+      <a *ngFor="let especialista of listaEspecialistasFiltrada" class="list-group-item list-group-item-action list-group-item-dark" (click)="seleccionarEspecialista(especialista)">{{especialista.nombre}} {{especialista.apellido}}</a>
+    </div>
+
+
+    <div style="display: flex; flex-direction: column; justify-content: center;" *ngIf="especialistaSeleccionado">
+      
+      <mat-form-field>
+        <mat-label>Fechas disponibles</mat-label>
+        <mat-select [(value)]="fechaSeleccionada">
+          
+          <mat-option *ngFor="let fecha of listaFechas" [value]="fecha">{{fecha | date}}</mat-option>
+
+        </mat-select>
+      </mat-form-field>
+
+      <br>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: center;" >
+        <button 
+        mat-raised-button 
+        style="width: 80px;" 
+        *ngFor="let boton of listaBotones"
+        (click)="seleccionarBoton(boton)"
+        [class.selected]="boton === botonSeleccionado"
+        
+        > 
+        {{boton}} 
+      </button>
+    </div>
+    
+    <!-- [disabled]="esTurnoAsignado(boton, especialistaSeleccionado)" -->
+
+      <br>
+      <div style="display: flex;justify-content: flex-end;">
+        <button 
+        mat-raised-button 
+        style="background-color: #1ab188;" 
+        [disabled]="!fechaSeleccionada || !botonSeleccionado"
+        (click)="confirmarTurno(especialistaSeleccionado)">
+          Confirmar Turno
+        </button>
+      </div>
+    </div>
+</div>
+  
