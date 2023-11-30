@@ -6,17 +6,16 @@
 
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" (click)="this.router.navigate(['home'])">Home</a>
-      <a class="nav-item nav-link" (click)="this.router.navigate(['usuarios'])">Usuarios</a>
-      <a class="nav-item nav-link" (click)="this.router.navigate(['solicitarTurno'])" >Solicitar turno</a>
-      <a class="nav-item nav-link" (click)="this.router.navigate(['misTurnos'])" >Mis Turnos</a>
-
+      <a class="nav-item nav-link" (click)="this.router.navigate(['usuarios'])" *ngIf="usuario?.tipo == 'admin'">Usuarios</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['turnos'])" *ngIf="usuario?.tipo == 'admin'">Turnos</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['solicitarTurno'])" *ngIf="usuario?.tipo == 'admin' || usuario?.tipo == 'paciente'">Solicitar turno</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['misTurnos'])" *ngIf="usuario?.tipo == 'especialista' || usuario?.tipo == 'paciente'">Mis Turnos</a>
+      <a class="nav-item nav-link" (click)="this.router.navigate(['pacientes'])" *ngIf="usuario?.tipo == 'especialista'">Pacientes</a>
     </div>
   </div>
   
   <div class="col-md-3 text-end">
     <ng-container *ngIf="estaLogueado; else showLoginButton">
-      <!-- <button type="button" class="btn btn-primary" (click)="logOut()">Salir</button> -->
       <button style="margin-right: 15px; width: 110px;" type="button" class="btn btn-primary" routerLink="miPerfil">Mi perfil</button>
       <button style="width: 110px" type="button" class="btn btn-outline-primary me-2"  (click)="logOut()">Salir</button>
     </ng-container>
@@ -31,15 +30,16 @@
 </nav>
 
 <div
-  class="bg-image"
-  style="
+class="bg-image"
+style="
     background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
     height: 94vh;
     display: grid;
-  ">
+    ">
   <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
-
-    <router-outlet></router-outlet>
-
+    <main [@routeAnimations]="prepareRoute(outlet)" class="content">
+      <router-outlet #outlet="outlet"></router-outlet>
+    </main>
+      
+    </div>
   </div>
-</div>

@@ -1,38 +1,149 @@
 
-<div
-  class="bg-image"
-  style="
-    background-image: url('../../../assets/GettyImages-1211152561-1.jpg');
-    height: 94vh;
-    display: grid;
-  ">
-    <div class="mask" style="background-color: rgba(0, 0, 0, 0.7);">
 
-        <div class="bg-success bg-opacity-50 "> 
-                <ul class="contenedor-tabs">
-                    <li class="tab tab-segunda" [class.active]="menuSeleccionado === 0"><a (click)="onValueChange(0)">Usuarios</a></li>
-                    <li class="tab tab-primera" [class.active]="menuSeleccionado === 1"><a (click)="onValueChange(1)">Registro</a></li>
-                </ul>
-        </div>
+<div class="bg-success bg-opacity-50 "> 
+        <ul class="contenedor-tabs">
+            <li class="tab tab-segunda" [class.active]="menuSeleccionado === 0"><a (click)="onValueChange(0)">Usuarios</a></li>
+            <li class="tab tab-primera" [class.active]="menuSeleccionado === 1"><a (click)="onValueChange(1)">Registro</a></li>
+        </ul>
+</div>
 
-        <div *ngIf="menuSeleccionado === 0">
-            <h1>Especialistas</h1>
-            <div class="contenedor-formularios d-flex flex-column align-items-center text-white" *ngFor="let especialista of listaEspecialistas">
-                <h2>Especialista en  {{especialista.especialidad}}</h2>
-                <h4>Nombre: {{especialista.nombre}} {{especialista.apellido}}</h4>
-                <h4>DNI: {{especialista.dni}}</h4>
-                <h4>Estado actual: {{especialista.estado}}</h4>
-    
-                <div >
-                    <br>
-                    <button class="btn btn-success btn-lg" (click)="cambiarEstado(especialista.uid, 'habilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'desabilitado'">Habilitar</button>
-                    <button class="btn btn-danger btn-lg" (click)="cambiarEstado(especialista.uid, 'desabilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'habilitado'">Desabilitar</button>
-                </div>
+<div *ngIf="menuSeleccionado === 0">
+
+    <h1>Especialistas</h1>
+
+    <div  style="display: flex; justify-content: space-around;">
+        <div class="contenedor-formularios d-flex flex-column align-items-center text-white" *ngFor="let especialista of listaEspecialistas">
+            <h2>Especialista en: </h2>
+            <h2 *ngFor="let esp of especialista.especialidades">- {{esp.tipo}}</h2>
+            <div style="display: flex; justify-content: center">
+              <img class="img-perfil" src="{{especialista.foto}}" alt="imagen 1" />
+            </div>
+            <h4>Nombre: {{especialista.nombre}} {{especialista.apellido}}</h4>
+            <h4>DNI: {{especialista.dni}}</h4>
+            <h4>Estado actual: {{especialista.estado}}</h4>
+
+            <div >
+                <br>
+                <button class="btn btn-success btn-lg" (click)="cambiarEstado(especialista.uid, 'habilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'desabilitado'">Habilitar</button>
+                <button class="btn btn-danger btn-lg" (click)="cambiarEstado(especialista.uid, 'desabilitado')" *ngIf="especialista.estado === 'pendiente-habilitacion' || especialista.estado === 'habilitado'">Desabilitar</button>
             </div>
         </div>
+    </div>
 
-        <div *ngIf="menuSeleccionado === 1">
-            <app-register [Admin]="true"></app-register>
+
+
+    <h1 style="margin-top: 30px;">Pacientes</h1>
+
+    <div style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+        <div class="contenedor-formularios d-flex flex-column align-items-center text-white" *ngFor="let paciente of listaPacientes">
+          <div style="display: flex; justify-content: center">
+            <img class="img-perfil" src="{{paciente.foto1}}" alt="imagen 1" />
+            <img class="img-perfil"  src="{{ paciente.foto2 }}" alt="imagen 2"/>
+          </div>
+            <h4>Nombre: {{paciente.nombre}} {{paciente.apellido}}</h4>
+            <h4>DNI: {{paciente.dni}}</h4>
+            <h4>Mail: {{paciente.mail}}</h4>
+
+            <div >
+                <br>
+                <button 
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal" 
+                    class="btn btn-info" 
+                    (click)="verHistorialClinico(paciente)"
+                >Ver historial clinico</button>
+            </div>
         </div>
     </div>
+
+    
+</div> 
+
+<!-- MODAL HISTORIAL CLINICO -->
+
+<div class="modal fade modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+
+        <div id="pdf">
+
+          <div class="modal-header" style="display: flex; justify-content: space-between;">
+
+            <div style="display: flex; align-items: center;">
+              <img src="../../../assets/logo.png" style="width: 130px;" alt="img" />
+              <h2 style="
+                  font-size: 1.5rem;
+                  font-weight: bolder;
+                " id="exampleModalLabel">
+                CLÍNICA ONLINE
+              </h2>
+            </div>
+            
+            <p style="text-align: right; font-size: 1rem">
+              {{ fechaActual  | date:'dd/MM/yyyy'}}
+            </p>
+
+          </div>
+          <div class="modal-body">
+
+            <h2 style="text-align: center; font-size: 2rem">
+              HISTORIAL CLÍNICO DE
+              <span style="text-transform: uppercase; font-weight: bolder">{{ pacienteSeleccionado?.apellido }} {{ pacienteSeleccionado?.nombre
+                }}</span>
+            </h2>
+
+            <h3 *ngIf="!listaHistorialClinico" style="text-align: center; color: #f00">
+              No existe historial clínico de esta especialidad
+            </h3>
+
+            <div *ngFor="let historial of listaHistorialClinico" class="carta-historial">
+
+              <h3 class="text-black"  style="text-transform: uppercase; font-weight: bolder; font-size: 1.5rem; text-align: center;">
+                {{ historial.especialidad }}
+              </h3>
+
+              <p class="text-black">
+                <span>- Especialista: </span>{{ historial?.especialista?.apellido }},
+                {{ historial?.especialista?.nombre }}
+              </p>
+              <p class="text-black"><span>- Detalle: </span></p>
+              <p class="text-black">Altura: {{ historial?.detalle?.altura }}</p>
+              <p class="text-black">Peso: {{ historial?.detalle?.peso }}</p>
+              <p class="text-black">Temperatura: {{ historial?.detalle?.temperatura }}</p>
+              <p class="text-black">Presión: {{ historial?.detalle?.presion }}</p>
+              <div *ngIf="historial.datalleAdicional">
+                <p class="text-black" ><span>- Detalles adicionales: </span></p>
+                <p class="text-black" *ngIf="historial?.datalleAdicional?.clave1">
+                  {{ historial?.datalleAdicional?.clave1 }}:
+                  {{ historial?.datalleAdicional?.valor1 }}
+                </p>
+                <p class="text-black" *ngIf="historial?.datalleAdicional?.clave2">
+                  {{ historial?.datalleAdicional?.clave2 }}:
+                  {{ historial?.datalleAdicional?.valor2 }}
+                </p>
+                <p class="text-black" *ngIf="historial?.datalleAdicional?.clave3">
+                  {{ historial?.datalleAdicional?.clave3 }}:
+                  {{ historial?.datalleAdicional?.valor3 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+
+          <button type="button" class="btn btn-danger"  (click)="crearPDF()">
+            Descargar PDF
+          </button>
+
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+<div *ngIf="menuSeleccionado === 1">
+    <app-register [Admin]="true"></app-register>
 </div>

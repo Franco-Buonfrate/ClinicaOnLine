@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/servicios/auth.service';
 import { FirestoreService } from 'src/app/servicios/firestore.service';
 import Swal from 'sweetalert2';
-
+import { Storage, ref, uploadBytes, getDownloadURL } from '@angular/fire/storage';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -25,42 +25,48 @@ export class RegisterComponent implements OnInit{
   especialidades:string[] = ['Cardiologia','Neurologia','Dermatologia',' ','Analisis Clinico'];
   espSubir:string = 'hola';
 
+
+  captcha: string = '';
+  captchaEscrito:string = '';
+  captchaValido:boolean = false;
+
   constructor(
       private formBuilder: FormBuilder, 
       private auth:AuthService,
       private router: Router,
-      private firestore:FirestoreService
+      private firestore:FirestoreService,
+      private storage:Storage
     ) {
     this.formularioPaciente = formBuilder.group({
-      nombre:['',[Validators.required]],
-      apellido:['',[Validators.required]],
-      dni:['',[Validators.required]],
-      edad:['',[Validators.required]],
-      obraSocial:['',[Validators.required]],
+      nombre:['',[Validators.required, Validators.maxLength(15)]],
+      apellido:['',[Validators.required, Validators.maxLength(15)]],
+      dni:['',[Validators.required, Validators.min(999999), Validators.max(99999999)]],
+      edad:['',[Validators.required, Validators.min(18)]],
+      obraSocial:['',[Validators.required, Validators.maxLength(20)]],
       mail:['',[Validators.required,Validators.email]],
-      contrasenia:['',[Validators.required]],
+      contrasenia:['',[Validators.required, Validators.minLength(6), Validators.maxLength(15)]],
       foto1:['',[Validators.required]],
       foto2:['',[Validators.required]]
     });
 
     this.formularioEspecialista = formBuilder.group({
-      nombre:['',[Validators.required]],
-      apellido:['',[Validators.required]],
-      dni:['',[Validators.required]],
-      edad:['',[Validators.required]],
+      nombre:['',[Validators.required, Validators.maxLength(15)]],
+      apellido:['',[Validators.required, Validators.maxLength(15)]],
+      dni:['',[Validators.required, Validators.min(999999), Validators.max(99999999)]],
+      edad:['',[Validators.required, Validators.min(18)]],
       especialidades:['',[Validators.required]],
       mail:['',[Validators.required,Validators.email]],
-      contrasenia:['',[Validators.required]],
+      contrasenia:['',[Validators.required, Validators.minLength(6), Validators.maxLength(15)]],
       foto:['',[Validators.required]]
     });
 
     this.formularioAdministrador = formBuilder.group({
-      nombre:['',[Validators.required]],
-      apellido:['',[Validators.required]],
-      dni:['',[Validators.required]],
-      edad:['',[Validators.required]],
+      nombre:['',[Validators.required, Validators.maxLength(15)]],
+      apellido:['',[Validators.required, Validators.maxLength(15)]],
+      dni:['',[Validators.required, Validators.min(999999), Validators.max(99999999)]],
+      edad:['',[Validators.required, Validators.min(18)]],
       mail:['',[Validators.required,Validators.email]],
-      contrasenia:['',[Validators.required]],
+      contrasenia:['',[Validators.required , Validators.minLength(6), Validators.maxLength(15)]],
       foto:['',[Validators.required]]
     });
   }
@@ -71,55 +77,75 @@ export class RegisterComponent implements OnInit{
       esps.forEach((e:any) => {
         this.especialidades.push(e.especialidad);
       });
-      console.log(this.especialidades);
     });
+
+    this.captcha = this.generarStringRandom();
   }
 
   cambioFormulario(tipoFormulario:number){
     this.tipoFormulario = tipoFormulario;
   }
   
-  onPacienteSubmit(){
+  async onPacienteSubmit(){
     this.formPacienteEnviado = true;
-    if(this.formularioPaciente.valid)
+    this.validarCaptcha();
+    if(this.formularioPaciente.valid && this.captchaValido)
     {
-      this.auth.register(this.formularioPaciente.value, 'paciente');
-      this.formPacienteEnviado = false;
-      this.formularioPaciente.reset();
-      this.alertaFormularioEnviado();
+      this.subirImagen('fotoPaciente1','pacientes').then((a) =>
+      {
+        this.formularioPaciente.value.foto1 = a;
+        this.subirImagen('fotoPaciente2','pacientes').then(async (b) => {
+          this.formularioPaciente.value.foto2 = b;
+          if(await this.auth.register(this.formularioPaciente.value, 'paciente'))
+          {
+            this.formPacienteEnviado = false;
+            this.formularioPaciente.reset();
+            this.alertaFormularioEnviado();
+          }
+        });
+      });
     }
     else{
       this.alertaFormularioInvalido();
     }
   }
 
-  onEspecialistaSubmit(){
+  async onEspecialistaSubmit(){
     this.formEspecialistaEnviado = true;
     let espObj:any = [];
     this.formularioEspecialista.value.especialidades.forEach((e:any) => {
       espObj.push({tipo:e, dias:[]}) //agrega array donde se setean los dias
     });
     this.formularioEspecialista.value.especialidades = espObj;
-    console.log(this.formularioEspecialista.value.especialidades );
-    if(this.formularioEspecialista.valid)
+    if(this.formularioEspecialista.valid && this.captchaValido)
     {
-      this.auth.register(this.formularioEspecialista.value, 'especialista');
-      this.formEspecialistaEnviado = false;
-      this.formularioEspecialista.reset();
-      this.alertaFormularioEnviado();
+      await this.subirImagen('fotoEspecialista', 'especialistas').then(async (a) => {
+        this.formularioEspecialista.value.foto = a;
+        if(await this.auth.register(this.formularioEspecialista.value, 'especialista'))
+        {
+          this.formEspecialistaEnviado = false;
+          this.formularioEspecialista.reset();
+          this.alertaFormularioEnviado();
+        }
+      });
     }else{
       this.alertaFormularioInvalido();
     }
   }
 
-  onAdministradorSubmit(){
+  async onAdministradorSubmit(){
     this.formAdministradorEnviado = true;
     if(this.formularioAdministrador.valid)
-    {
-      this.auth.register(this.formularioAdministrador.value, 'admin');
-      this.formAdministradorEnviado = false;
-      this.formularioAdministrador.reset();
-      this.alertaFormularioEnviado();
+    { 
+      await this.subirImagen('fotoAdmin', 'admins').then(async (a) => {
+        this.formularioAdministrador.value.foto = a;
+        if(await this.auth.register(this.formularioAdministrador.value, 'admin'))
+        {
+          this.formAdministradorEnviado = false;
+          this.formularioAdministrador.reset();
+          this.alertaFormularioEnviado();
+        }
+      });
     }else{
       this.alertaFormularioInvalido();
     }
@@ -178,4 +204,54 @@ export class RegisterComponent implements OnInit{
 
     }
   }
+
+  async subirImagen(idElementoHtml:string, dni:string)
+  {
+    const fileInput = document.getElementById(idElementoHtml) as HTMLInputElement
+    const file = fileInput.files ? fileInput.files[0] : null;
+    if(file)
+    {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      const hours = currentDate.getHours().toString().padStart(2, '0');
+      const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+      const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+
+      const fileName = `img${idElementoHtml}_${year}${month}${day}_${hours}${minutes}${seconds}`;
+      const imgRef = ref(this.storage, `usuarios/${dni}/${fileName}`);
+      await uploadBytes(imgRef, file);
+
+      const url = await getDownloadURL(imgRef);
+      return url;
+    }
+    else{
+      return null;
+    }
+  }
+
+  generarStringRandom()
+  {
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
+    let result1 = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < 6; i++) {
+      result1 += characters.charAt(
+        Math.floor(Math.random() * charactersLength)
+      );
+    }
+    return result1;
+  }
+
+  validarCaptcha() {
+    if (this.captchaEscrito == this.captcha) {
+      this.captchaValido = true;
+    } else {
+      this.captchaValido = false;
+    }
+  }
+
+
 }

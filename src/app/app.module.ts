@@ -12,6 +12,7 @@ import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { RegisterComponent } from './paginas/register/register.component';
 import { SeccionUsuariosAdminComponent } from './paginas/seccion-usuarios-admin/seccion-usuarios-admin.component';
@@ -27,13 +28,14 @@ import { MisTurnosComponent } from './paginas/mis-turnos/mis-turnos.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatSelectModule} from '@angular/material/select';
 import { MisTurnosEspecialistaComponent } from './componentes/mis-turnos-especialista/mis-turnos-especialista.component';
+import { PacientesComponent } from './paginas/pacientes/pacientes.component';
+import { TurnosComponent } from './paginas/turnos/turnos.component';
 
 
 @NgModule({
@@ -49,6 +51,8 @@ import { MisTurnosEspecialistaComponent } from './componentes/mis-turnos-especia
     MisTurnosPacienteComponent,
     MiPerfilComponent,
     MisTurnosEspecialistaComponent,
+    PacientesComponent,
+    TurnosComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,6 +61,7 @@ import { MisTurnosEspecialistaComponent } from './componentes/mis-turnos-especia
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
+    provideStorage(() => getStorage()),
     ReactiveFormsModule,
     FormsModule,
     NgbModule,
@@ -64,14 +69,15 @@ import { MisTurnosEspecialistaComponent } from './componentes/mis-turnos-especia
     MatButtonModule,
     MatIconModule,
     MatExpansionModule,
-    MatDatepickerModule,
     MatFormFieldModule,
     MatNativeDateModule,
     MatInputModule,
     MatButtonToggleModule,
     MatSelectModule,
+    BrowserModule,
+    BrowserAnimationsModule
   ],
-  providers: [ AuthService, MatDatepickerModule,  { provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig}],
+  providers: [ AuthService,   { provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

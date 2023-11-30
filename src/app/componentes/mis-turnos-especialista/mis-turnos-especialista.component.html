@@ -1,43 +1,196 @@
 <div class="contenedor-formularios">
 
-    <div class="d-flex justify-content-center intentos">
-        <label style="
+  <div class="d-flex justify-content-center intentos">
+    <label style="
                 font-size: 1.8rem;
-         
                 color: white;
               ">Filtrar: </label>
-        <input class="input-busqueda" type="text" [(ngModel)]="palabraBusqueda" (keyup)="filtrarPorCampos()"
-          placeholder="Ingresar busqueda..." />
+    <input class="input-busqueda" type="text" [(ngModel)]="palabraBusqueda" (keyup)="filtrarPorCampos()"
+      placeholder="Ingresar busqueda..." />
+  </div>
+
+  <table class="table table-dark table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Especialidad</th>
+        <th scope="col">Paciente</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let turno of turnosFiltrados">
+        <td>{{turno.fecha.toDate() | date}}</td>
+        <td>{{turno.especialidad}}</td>
+        <td>{{turno.paciente.nombre}}, {{turno.paciente.apellido}}</td>
+        <td>{{turno.estado}}</td>
+        <td>
+          <button class="btn btn-danger" *ngIf="turno.estado == 'pendiente'"
+            (click)="cancelarTurno(turno)">Cancelar</button>
+          <button class="btn btn-success" *ngIf="turno.estado == 'pendiente'"
+            (click)="cambiarEstadoTurno(turno, 'aceptado')">Aceptar</button>
+          <button class="btn btn-warning" *ngIf="turno.estado == 'aceptado'"
+            (click)="rechazarTurno(turno)">Rechazar</button>
+          <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary"
+            *ngIf="turno.estado == 'aceptado'" (click)="finalizarTurno(turno)">Finalizar</button>
+          <button class="btn btn-info" *ngIf="turno.comentarioPac" (click)="verResenia(turno.comentarioPac , 'comentario')">Ver comentario</button>  
+          <button class="btn btn-info" *ngIf="turno.resenia" (click)="verResenia(turno.resenia , 'reseña')">Ver Reseña</button>  
+
+
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"
+    style="justify-content: center;display: flex;align-items: center;width: 100%; height: 100%;">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h2 style="    text-align: center;
+          font-size: 1rem;
+          color: #000;
+          padding: 10px;
+          font-weight: bolder;
+          font-family: 'Jost', sans-serif;">HISTORIAL CLÍNICO</h2>
+        <div>
+          <p>
+            <span style="font-weight: bolder">Especialista:</span>
+            {{ turnoFinalizado?.especialista?.apellido }},
+            {{ turnoFinalizado?.especialista?.nombre }}
+          </p>
+          <p>
+            <span style="font-weight: bolder">Paciente:</span>
+            {{ turnoFinalizado?.paciente?.apellido }},
+            {{ turnoFinalizado?.paciente?.nombre }}
+          </p>
+          <p>
+            <span style="font-weight: bolder">Especialidad:</span>
+            {{ turnoFinalizado?.especialidad }}
+          </p>
+        </div>
+        <form [formGroup]="formHistorial" class="contenedor-form text-focus-in">
+          
+
+          <!-- INPUT ALTURA -->
+          <div class="col-sm mb-3">
+            <label for="altura" class="form-label">Altura</label>
+            <input formControlName="altura" type="number" class="form-control" placeholder="Altura" min="1"
+              max="2.5" />
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['altura'].errors?.['required'] &&
+      formHistorial.controls['altura'].touched
+                        ">
+              Este campo es requerido
+            </small>
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['altura'].errors?.['min'] ||
+                          (formHistorial.controls['altura'].errors?.['max'] &&
+                          formHistorial.controls['altura'].touched)
+                        ">
+              Debe ser de 1 a 2.5 metros
+            </small>
+          </div>
+
+          <!-- INPUT PESO -->
+          <div class="col-sm mb-3">
+            <label for="peso" class="form-label">Peso</label>
+            <input formControlName="peso" type="number" class="form-control" placeholder="Peso" min="20" max="200" />
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['peso'].errors?.['required'] &&
+      formHistorial.controls['peso'].touched
+                        ">
+              Este campo es requerido
+            </small>
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['peso'].errors?.['min'] ||
+                          (formHistorial.controls['peso'].errors?.['max'] &&
+                          formHistorial.controls['peso'].touched)
+                        ">
+              Debe ser entre 20 y 200 kg
+            </small>
+          </div>
+
+          <!-- INPUT TEMPERATURA -->
+          <div class="col-sm mb-3">
+            <label for="temperatura" class="form-label">Temperatura</label>
+            <input formControlName="temperatura" type="number" class="form-control" placeholder="Temperatura" min="35"
+              max="45" />
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['temperatura'].errors?.['required'] &&
+      formHistorial.controls['temperatura'].touched
+                        ">
+              Este campo es requerido
+            </small>
+            <small class="mensaje-error" *ngIf="
+              formHistorial.controls['temperatura'].errors?.['min'] ||
+                          (formHistorial.controls['temperatura'].errors?.['max'] &&
+                          formHistorial.controls['temperatura'].touched)
+                        ">
+              Debe ser entre 35 y 45°C
+            </small>
+          </div>
+
+          <!-- INPUT PRESION -->
+          <div class="col-sm mb-3">
+            <label for="presion" class="form-label">Presión</label>
+            <input formControlName="presion" type="text" class="form-control" placeholder="Presión" />
+            <small class="mensaje-error" *ngIf="
+                        formHistorial.controls['presion'].errors?.['required'] &&
+                formHistorial.controls['presion'].touched
+                                  ">
+              Este campo es requerido
+            </small>
+          </div>
+        </form>
+        <div class="contenedor-adicionales">
+          <h3 style="    
+          text-align: center;
+          font-size: 1rem;
+          color: #000;
+          padding: 10px;
+          font-weight: bolder;
+          font-family: 'Jost', sans-serif;">DATOS ADICIONALES</h3>
+          <button type="button" class="btn btn-warning" (click)="agregarClaveValor()">
+            Agregar
+          </button>
+          <div>
+            <div class="row mt-2" *ngIf="cantidadClaveValor >= 1">
+              <div class="col">
+                <input [(ngModel)]="dato1[0]" type="text" class="form-control" placeholder="Clave" />
+              </div>
+              <div class="col">
+                <input [(ngModel)]="dato1[1]" type="text" class="form-control" placeholder="Valor" />
+              </div>
+            </div>
+            <div class="row mt-2" *ngIf="cantidadClaveValor > 1">
+              <div class="col">
+                <input [(ngModel)]="dato2[0]" type="text" class="form-control" placeholder="Clave" />
+              </div>
+              <div class="col">
+                <input [(ngModel)]="dato2[1]" type="text" class="form-control" placeholder="Valor" />
+              </div>
+            </div>
+            <div class="row mt-2" *ngIf="cantidadClaveValor == 3">
+              <div class="col">
+                <input [(ngModel)]="dato3[0]" type="text" class="form-control" placeholder="Clave" />
+              </div>
+              <div class="col">
+                <input [(ngModel)]="dato3[1]" type="text" class="form-control" placeholder="Valor" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="float: right; margin-top: 1rem" data-bs-dismiss="modal"
+          (click)="crearHistorialClinico()" [disabled]="formHistorial.invalid">
+          Guardar Historial
+        </button>
+      </div>
     </div>
-
-    <table class="table table-dark table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">Fecha</th>
-            <th scope="col">Especialidad</th>
-            <th scope="col">Especialista</th>
-            <th scope="col">Estado</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let turno of turnosFiltrados">
-            <td>{{turno.fecha.toDate() | date}}</td>
-            <td>{{turno.especialidad}}</td>
-            <td>{{turno.especialista.nombre}}</td>
-            <td>{{turno.estado}}</td>
-            <td>
-            <button class="btn btn-danger" *ngIf="turno.estado == 'pendiente'" (click)="cambiarEstadoTurno(turno, 'cancelado')">Cancelar</button> 
-            <button class="btn btn-warning" *ngIf="turno.estado == 'pendiente'" (click)="cambiarEstadoTurno(turno, 'rechazado')">Rechazar</button>  
-            <button class="btn btn-success" *ngIf="turno.estado == 'pendiente'" (click)="cambiarEstadoTurno(turno, 'aceptado')">Aceptar</button> 
-            <button class="btn btn-primary" *ngIf="turno.estado == 'aceptado'">Finalizar</button>  
-            <button class="btn btn-info" *ngIf="turno.resenia">Reseña</button>  
-
-
-
-            </td>
-
-          </tr>
-        </tbody>
-      </table>
+  </div>
 </div>

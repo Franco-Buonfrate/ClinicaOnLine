@@ -51,3 +51,21 @@
     background: #081410;
     transition: background 0.5s;
   }
+
+  .carta-historial {
+    h3 {
+      color: #000;
+      background: #83bf9b;
+      font-weight: bolder;
+      padding: 1rem;
+    }
+  
+    span {
+      font-weight: bolder;
+    }
+
+    p {
+      color: #000;
+    }
+  }
+  

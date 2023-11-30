@@ -1,19 +1,5 @@
-* {
-    padding: 0;
-    margin: 0;
-  }
-  
-  *,
-  *:before,
-  *:after {
-    box-sizing: border-box;
-  }
-  
-  body {
-    background: #c1bdba;
-    font-family: "Ubuntu", helvetica;
-  }
-  
+
+
   a {
     text-decoration: none;
     color: #1ab188;
@@ -27,11 +13,20 @@
     background: rgba(19, 35, 47, 0.9);
     padding: 40px;
     max-width: 600px;
-    margin: 40px auto;
     border-radius: 4px;
     box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
   }
   
+  .img-perfil {
+    width: 7rem;
+    height: 7rem;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px outset #000000a6;
+    margin-bottom: 1rem;
+    margin-left: 0.5rem;
+  }
+
   .contenedor-tabs {
     list-style: none;
     padding: 0;

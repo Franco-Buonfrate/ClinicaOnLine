@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Timestamp } from 'firebase/firestore';
+import { first } from 'rxjs';
 import { AuthService } from 'src/app/servicios/auth.service';
 import { FirestoreService } from 'src/app/servicios/firestore.service';
 
@@ -14,7 +15,7 @@ export class SacarTurnosComponent implements OnInit{
   usuario:any;
 
   listaEspecialistas:any = [];
-  listaEspecialidades:string[] = [];
+  listaEspecialidades:any[] = [];
   listaFechas:any = null;
 
   especialidadSeleccionada:string='';
@@ -23,29 +24,35 @@ export class SacarTurnosComponent implements OnInit{
   botonSeleccionado:string = '';
 
   listaEspecialistasFiltrada:any = [];
-
-
-
   
   listaBotones:any = ['8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00'];
   fontStyleControl = new FormControl('');
   fontStyle?: string;
 
-
+  listaPacientes:any[] = [];
+  paciente:any = null;
   constructor(private firestoreService: FirestoreService, private auth:AuthService, private router:Router){}
 
   ngOnInit(): void {
     this.usuario = this.auth.usuarioActual
     if(this.usuario && (this.usuario.tipo == 'paciente' || this.usuario.tipo == 'admin'))
     {
-      this.firestoreService.traerEspecialidades()?.subscribe((lista:any)=>{
-        this.listaEspecialidades = [];
-        lista.forEach((esp:any) => {
-          this.listaEspecialidades.push(esp.especialidad);
+      if(this.usuario.tipo == 'admin')
+      {
+        this.firestoreService.traerPacientes()?.pipe(first()).subscribe((pacientes:any) => {
+          this.listaPacientes = pacientes;
         });
+      }
+      else
+      {
+        this.paciente = this.usuario;
+      }
+
+      this.firestoreService.traerEspecialidades()?.pipe(first()).subscribe((lista:any)=>{
+        this.listaEspecialidades = lista;
       });
 
-      this.firestoreService.traerEspecialistas()?.subscribe(listado => {
+      this.firestoreService.traerEspecialistas()?.pipe(first()).subscribe(listado => {
         this.listaEspecialistas = [];
         listado.forEach(e => {
           e = {
@@ -63,12 +70,12 @@ export class SacarTurnosComponent implements OnInit{
 
   }
 
-  seleccionarEspecialidad(especialidad:string)
+  seleccionarEspecialidad(especialidad:any)
   {
     this.listaEspecialistasFiltrada = [];
-    this.especialidadSeleccionada = especialidad;
+    this.especialidadSeleccionada = especialidad.especialidad;
     this.listaEspecialistas.forEach((esp:any) => {
-      if(esp.especialidades.some((a:any)=>a.tipo == especialidad))
+      if(esp.especialidades.some((a:any)=>a.tipo == this.especialidadSeleccionada))
       {
         this.listaEspecialistasFiltrada.push(esp);
       }
@@ -92,8 +99,6 @@ export class SacarTurnosComponent implements OnInit{
       }
     });
 
-    console.log(diasSemana);
-
     // Obtener la fecha actual
     const fechaActual: Date = new Date();
 
@@ -107,7 +112,6 @@ export class SacarTurnosComponent implements OnInit{
         fechas.push(fecha);
       }
     }
-    console.log(fechas);
 
     return fechas;
   }
@@ -119,6 +123,10 @@ export class SacarTurnosComponent implements OnInit{
 
   seleccionarBoton(boton:string){
     this.botonSeleccionado = boton;
+  }
+
+  seleccionarFecha(fecha:Date){
+    this.fechaSeleccionada = fecha;
   }
 
   esTurnoAsignado(boton: string, especialista: any): boolean {
@@ -148,11 +156,10 @@ export class SacarTurnosComponent implements OnInit{
 
       this.fechaSeleccionada.setHours(Number(hora), Number(minutos), 0);
 
-      console.log(this.fechaSeleccionada);
 
       const turno = {
         fecha:Timestamp.fromMillis(this.fechaSeleccionada.getTime()), 
-        paciente:{ uid:this.usuario.uid, nombre:this.usuario.nombre, apellido:this.usuario.apellido }, 
+        paciente:{ uid:this.paciente.uid, nombre:this.paciente.nombre, apellido:this.paciente.apellido }, 
         especialista:{ uid:especialista.uid, nombre:especialista.nombre, apellido:especialista.apellido },
         especialidad:this.especialidadSeleccionada,
         estado:'pendiente',
@@ -160,12 +167,13 @@ export class SacarTurnosComponent implements OnInit{
         resenia:'',
         comentarioEsp:'',
         comentarioPac:'',
-        diagnostico:''
+        detalle:null,
+        datalleAdicional:null
       }
 
       
 
-      this.firestoreService.subirTurnoPacienteEspecialista(turno, especialista, this.usuario);
+      this.firestoreService.subirTurnoPacienteEspecialista(turno, especialista, this.paciente);
 
       this.especialidadSeleccionada = '';
       this.especialistaSeleccionado  = null;
@@ -174,6 +182,18 @@ export class SacarTurnosComponent implements OnInit{
     }
   }
 
+  seleccionarPaciente(paciente:any){
+    this.paciente = paciente;
+  }
 
-
+  backButton(){
+    this.especialidadSeleccionada = '';
+    this.especialistaSeleccionado  = null;
+    this.fechaSeleccionada = null;
+    this.botonSeleccionado = '';
+    if(this.usuario.tipo == 'admin')
+    {
+      this.paciente = null;
+    }
+  }
 }

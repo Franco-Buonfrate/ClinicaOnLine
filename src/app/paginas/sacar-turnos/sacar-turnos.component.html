@@ -1,119 +1,87 @@
-<div class="contenedor-formularios">
+<div class="example-button-container">
+  <button mat-fab matTooltip="Primary" color="primary" style="margin-top: 30px; margin-left: 30px;" (click)="backButton()">
+    <mat-icon>subdirectory_arrow_left</mat-icon>
+  </button>
+</div>
+<div *ngIf="usuario.tipo == 'admin' && !paciente" style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+  <div class="contenedor-pacientes" *ngFor="let paciente of listaPacientes">
+    <div style="display: flex; justify-content: center">
+      <img class="img-perfil" src="{{paciente.foto1}}" alt="imagen 1" />
+      <img class="img-perfil"  src="{{ paciente.foto2 }}" alt="imagen 2"/>
+    </div>
+      <h4 class="text-white">Nombre: {{paciente.nombre}} {{paciente.apellido}}</h4>
+      <h4 class="text-white">DNI: {{paciente.dni}}</h4>
+      <h4 class="text-white">Mail: {{paciente.mail}}</h4>
 
-    <!-- <mat-accordion class="example-headers-align" >
-      <mat-expansion-panel *ngFor="let especialista of listaEspecialistas" (expandedChange)="limpiar(especialista)">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{especialista.nombre}} {{especialista.apellido}}
-          </mat-panel-title>
-          <mat-panel-description>
-            {{especialista.especialidad}}
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        
-            <div style="display: flex; flex-direction: column; justify-content: center;">
-              <mat-form-field class="example-full-width">
-                <mat-label>Seleccione una fecha</mat-label>
-                <input disabled matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" (dateChange)="especialista.nuevoTurno = $event.value">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker disabled="false"></mat-datepicker>
-              </mat-form-field>
-      
-              <br>
-      
-              <div style="display: flex; flex-wrap: wrap; justify-content: center;" >
-                <button 
-                mat-raised-button 
-                style="width: 80px;" 
-                *ngFor="let boton of listaBotones"
-                (click)="seleccionarBoton(boton)"
-                [class.selected]="boton === botonSeleccionado"
-                [disabled]="esTurnoAsignado(boton, especialista)"
-                > 
-                    {{boton}} 
-                </button>
-              </div>
-      
-            </div>
-            <br>
-            <div style="display: flex;justify-content: flex-end;">
-              <button 
-              mat-raised-button 
-              style="background-color: #1ab188;" 
-              [disabled]="!fechaSeleccionada || !botonSeleccionado"
-              (click)="confirmarTurno(especialista)">
-                Confirmar Turno
-              </button>
-            </div>
-      </mat-expansion-panel>
-    </mat-accordion> -->
-  
-    <!-- <mat-accordion class="example-headers-align" >
-      <mat-expansion-panel *ngFor="let especialidad of listaEspecialidades" >
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            {{especialidad}}
-          </mat-panel-title>
-        </mat-expansion-panel-header>
+      <div >
+          <br>
+          <button 
+            class="btn btn-info" 
+            (click)="seleccionarPaciente(paciente)"
+          >Agregar turno</button>
+      </div>
+  </div>
+</div>
 
-        <div class="list-group">
-          <button *ngFor="let especialista of listarPorEspecialidad(especialidad)"  type="button" class="list-group-item list-group-item-action list-group-item-dark">{{especialista.nombre}} {{especialista.apellido}}</button>
-        </div>
+<div *ngIf="!especialidadSeleccionada && paciente" style="display: flex; justify-content: space-around; margin-bottom: 30px;">
+  <div *ngFor="let especialidad of listaEspecialidades" class="contenedor-pacientes" (click)="seleccionarEspecialidad(especialidad)">
+    <div style="display: flex; justify-content: center">
+      <img class="img-perfil" src="{{especialidad.foto}}"/>
+    </div>
+    <h1 class="text-white" style="text-align: center;">{{especialidad.especialidad}}</h1>
+  </div>
+</div>
 
+<div *ngIf="especialidadSeleccionada && !especialistaSeleccionado" style="display: flex; justify-content: space-around; margin-bottom: 30px;" >
+  <div class="contenedor-pacientes" *ngFor="let especialista of listaEspecialistasFiltrada" (click)="seleccionarEspecialista(especialista)">
+    <div style="display: flex; justify-content: center">
+      <img class="img-perfil" src="{{especialista.foto}}" alt="imagen 1" />
+    </div>
+      <h4 class="text-white">Nombre: {{especialista.nombre}} {{especialista.apellido}}</h4>
+  </div>
+</div>
 
-
-      </mat-expansion-panel>
-    </mat-accordion> -->
-
-
-
-    <div class="list-group" *ngIf="!especialidadSeleccionada">
-      <a *ngFor="let especialidad of listaEspecialidades" class="list-group-item list-group-item-action list-group-item-dark" (click)="seleccionarEspecialidad(especialidad)">{{especialidad}}</a>
+<div *ngIf="especialistaSeleccionado" class="contenedor-formularios" >
+  <div style="display: flex; flex-direction: column; justify-content: center;" >
+    <div>
+      <button 
+        mat-raised-button 
+        *ngFor="let fecha of listaFechas"
+        (click)="seleccionarFecha(fecha)"
+        [class.selected]="fecha === fechaSeleccionada"
+      > 
+        {{fecha | date:'dd/MM'}} 
+      </button>
     </div>
 
-    <div class="list-group" *ngIf="especialidadSeleccionada && !especialistaSeleccionado">
-      <a *ngFor="let especialista of listaEspecialistasFiltrada" class="list-group-item list-group-item-action list-group-item-dark" (click)="seleccionarEspecialista(especialista)">{{especialista.nombre}} {{especialista.apellido}}</a>
-    </div>
+    <br>
 
-
-    <div style="display: flex; flex-direction: column; justify-content: center;" *ngIf="especialistaSeleccionado">
-      
-      <mat-form-field>
-        <mat-label>Fechas disponibles</mat-label>
-        <mat-select [(value)]="fechaSeleccionada">
-          
-          <mat-option *ngFor="let fecha of listaFechas" [value]="fecha">{{fecha | date}}</mat-option>
-
-        </mat-select>
-      </mat-form-field>
-
-      <br>
-
-      <div style="display: flex; flex-wrap: wrap; justify-content: center;" >
-        <button 
+    <div style="display: flex; flex-wrap: wrap; justify-content: center;" >
+      <button 
         mat-raised-button 
         style="width: 80px;" 
         *ngFor="let boton of listaBotones"
         (click)="seleccionarBoton(boton)"
         [class.selected]="boton === botonSeleccionado"
-        
+        [disabled]="!fechaSeleccionada"
         > 
         {{boton}} 
       </button>
     </div>
-    
-    <!-- [disabled]="esTurnoAsignado(boton, especialistaSeleccionado)" -->
+  
+  <!-- [disabled]="esTurnoAsignado(boton, especialistaSeleccionado)" -->
 
-      <br>
-      <div style="display: flex;justify-content: flex-end;">
-        <button 
-        mat-raised-button 
-        style="background-color: #1ab188;" 
-        [disabled]="!fechaSeleccionada || !botonSeleccionado"
-        (click)="confirmarTurno(especialistaSeleccionado)">
-          Confirmar Turno
-        </button>
-      </div>
+    <br>
+    <div style="display: flex;justify-content: flex-end;">
+      <button 
+      mat-raised-button 
+      style="background-color: #1ab188;" 
+      [disabled]="!fechaSeleccionada || !botonSeleccionado"
+      (click)="confirmarTurno(especialistaSeleccionado)">
+        Confirmar Turno
+      </button>
+      
     </div>
+  </div>
 </div>
   

@@ -1,27 +1,54 @@
-# TpClinicaLabo4
+# Trabajo practico - Laboratorio 4 - Franco Buonfrate
+Trabajo practico desarrollado para la materia laboratorio 4 en la UTN Fra.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.0.
 
-## Development server
+## Clinica OnLine
+Proyecto orientado a la administracion en linea del sistema de usuarios de la clinica medica "OnLine".
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Pagina Principal
 
-## Code scaffolding
+![](fotos/1.png)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Registro
 
-## Build
+![](fotos/2.png)![](fotos/3.png)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Inicio de sesion
 
-## Running unit tests
+![](fotos/4.png) 
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Solicitar Turno (Paciente)
 
-## Running end-to-end tests
+![](fotos/5.png) ![](fotos/6.png)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Mis Turnos (Paciente)
 
-## Further help
+![](fotos/7.png)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Mi perfil (Paciente)
+
+![](fotos/8.png) ![](fotos/9.png)
+
+### Mis Turnos (Especialista)
+
+![](fotos/10.png) ![](fotos/11.png)
+
+### Pacientes (Especialista)
+
+![](fotos/12.png) ![](fotos/13.png)
+
+### Mi perfil (Especialista)
+
+![](fotos/14.png)
+
+### Usuarios (Administrador)
+
+![](fotos/15.png) ![](fotos/16.png)
+
+### Turnos (Administrador)
+
+![](fotos/17.png)
+
+### Solicitar Turno (Administrador)
+
+![](fotos/18.png)

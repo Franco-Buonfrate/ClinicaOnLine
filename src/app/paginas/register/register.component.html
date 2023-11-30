@@ -5,6 +5,9 @@
     <div class="contenedor-formularios d-flex flex-column align-items-center text-white" (click)="cambioFormulario(1)">
         <img style="height: 15vh;" src="../../../assets/medico.png">
     </div>
+    <div *ngIf="Admin" class="contenedor-formularios d-flex flex-column align-items-center text-white" (click)="cambioFormulario(2)">
+        <img style="height: 15vh;" src="../../../assets/admin.png">
+    </div>
 </div>
 
 <div class="contenedor-formularios" *ngIf="tipoFormulario != -1">
@@ -107,26 +110,46 @@
                         >
                 </div>
 
-                <!-- Foto -->
-                <div class="contenedor-input">
-                    <input 
+                <div class="fila-arriba">
+                    <!-- Foto -->
+                    <div class="contenedor-input">
+                        <input 
+                            type="file" 
+                            class="custom-file-input" 
+                            required
+                            formControlName="foto1"
+                            id="fotoPaciente1"
+                            [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto1')?.invalid"
+                        >
+                    </div>
+
+                    <!-- Foto 2 -->
+                    <div class="contenedor-input">
+                        <input 
                         type="file" 
                         class="custom-file-input" 
                         required
-                        formControlName="foto1"
-                        [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto1')?.invalid"
-                    >
+                        formControlName="foto2"
+                        id="fotoPaciente2"
+                        [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto2')?.invalid"
+                        >
+                    </div>
                 </div>
 
-                <!-- Foto 2 -->
-                <div class="contenedor-input">
-                    <input 
-                    type="file" 
-                    class="custom-file-input" 
-                    required
-                    formControlName="foto2"
-                    [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto2')?.invalid"
-                    >
+                <!-- CAPTCHA -->
+                <div class="fila-arriba">
+                    <div class="contenedor-input">
+                        <input [ngModelOptions]="{standalone: true}" type="text" class="form-control"
+                        [(ngModel)]="captchaEscrito" (input)="validarCaptcha()"
+                        [ngClass]="{'is-invalid': !captchaValido, 'is-valid': captchaValido}"
+                        placeholder="CAPTCHA" style="height: 40%;"/>
+                    </div>
+
+                    <div class="flex-column" style="flex: 1;">
+                        <p class="captcha" style="margin-top: 4.5%;">
+                            {{ captcha }}
+                        </p>
+                    </div>
                 </div>
 
                 <input type="submit" class="button button-block" value="Registrar">
@@ -145,7 +168,7 @@
                             placeholder="Nombre" 
                             required 
                             formControlName="nombre"
-                            [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('nombre')?.invalid"
+                            [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('nombre')?.invalid"
                         >
                     </div>
 
@@ -155,7 +178,7 @@
                             placeholder="Apellido" 
                             required
                             formControlName="apellido"
-                            [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('apellido')?.invalid"
+                            [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('apellido')?.invalid"
                         >
                     </div>
                 </div>
@@ -168,7 +191,7 @@
                             placeholder="DNI"
                             required 
                             formControlName="dni"
-                            [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('dni')?.invalid"
+                            [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('dni')?.invalid"
                          >
                     </div>
 
@@ -178,34 +201,19 @@
                             placeholder="Edad" 
                             required
                             formControlName="edad"
-                            [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('edad')?.invalid"
+                            [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('edad')?.invalid"
                         >
                     </div>
                 </div>
 
                 <!-- Especialidad -->
-                    <!-- <input 
-                        list="datalistOptions" 
-                        placeholder="Especialidad"
-                        required
-                        formControlName="especialidad"
-                        [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('especialidad')?.invalid"
-                    >
-
-                    <datalist id="datalistOptions">
-                        <option value="Cardiologia">
-                        <option value="Neurologia">
-                        <option value="Dermatologia">
-                        <option value="Traumatologia">
-                        <option value="Analisis Clinico">
-                    </datalist> -->
                 <div class="fila-arriba">
                     <div class="contenedor-input">
                         <mat-form-field style="background-color: #ffffff00 important; ">
                             <mat-label>Especialidades</mat-label>
                             <mat-select formControlName="especialidades" multiple>
                                 
-                            <mat-option *ngFor="let esp of especialidades" [value]="esp">{{esp}}</mat-option>
+                                <mat-option *ngFor="let esp of especialidades" [value]="esp">{{esp}}</mat-option>
     
                             </mat-select>
                         </mat-form-field>
@@ -228,7 +236,7 @@
                         placeholder="Mail" 
                         required
                         formControlName="mail"
-                        [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('mail')?.invalid"
+                        [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('mail')?.invalid"
                     >
                 </div>
                 
@@ -239,7 +247,7 @@
                         placeholder="Contraseña" 
                         required
                         formControlName="contrasenia"
-                        [class.invalid-input]="formEspecialistaEnviado && formularioPaciente.get('contrasenia')?.invalid"
+                        [class.invalid-input]="formEspecialistaEnviado && formularioEspecialista.get('contrasenia')?.invalid"
                     >
                 </div>
 
@@ -250,13 +258,34 @@
                     class="custom-file-input" 
                     required
                     formControlName="foto"
-                    [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto')?.invalid"
+                    [class.invalid-input]="formPacienteEnviado && formularioEspecialista.get('foto')?.invalid"
+                    id="fotoEspecialista"
                     >
+                </div>
+
+                <!-- CAPTCHA -->
+
+                <div class="fila-arriba">
+                    <div class="contenedor-input">
+                        <input [ngModelOptions]="{standalone: true}" type="text" class="form-control"
+                        [(ngModel)]="captchaEscrito" (input)="validarCaptcha()"
+                        [ngClass]="{'is-invalid': !captchaValido, 'is-valid': captchaValido}"
+                        placeholder="CAPTCHA" style="height: 40%;"/>
+                    </div>
+
+                    <div class="flex-column" style="flex: 1;">
+                        <p class="captcha" style="margin-top: 4.5%;">
+                            {{ captcha }}
+                        </p>
+                    </div>
+
                 </div>
 
                 <input type="submit" class="button button-block" value="Registrar">
             </form>
         </div>
+
+        <!-- ADMINISTRADOR -->
 
         <div *ngIf="tipoFormulario === 2">
             <h1>Registro Administrador</h1>
@@ -270,7 +299,7 @@
                             placeholder="Nombre" 
                             required 
                             formControlName="nombre"
-                            [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('nombre')?.invalid"
+                            [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('nombre')?.invalid"
                         >
                     </div>
 
@@ -280,7 +309,7 @@
                             placeholder="Apellido" 
                             required
                             formControlName="apellido"
-                            [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('apellido')?.invalid"
+                            [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('apellido')?.invalid"
                         >
                     </div>
                 </div>
@@ -293,7 +322,7 @@
                             placeholder="DNI" 
                             required 
                             formControlName="dni"
-                            [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('dni')?.invalid"
+                            [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('dni')?.invalid"
                         >
                     </div>
 
@@ -303,7 +332,7 @@
                             placeholder="Edad" 
                             required
                             formControlName="edad"
-                            [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('edad')?.invalid"
+                            [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('edad')?.invalid"
                         >
                     </div>
                 </div>
@@ -315,7 +344,7 @@
                         placeholder="Mail" 
                         required
                         formControlName="mail"
-                        [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('mail')?.invalid"
+                        [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('mail')?.invalid"
                         >
                 </div>
                 
@@ -326,7 +355,7 @@
                         placeholder="Contraseña"
                         required
                         formControlName="contrasenia"
-                        [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('contrasenia')?.invalid"
+                        [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('contrasenia')?.invalid"
                         >
                 </div>
 
@@ -337,8 +366,25 @@
                         class="custom-file-input" 
                         required
                         formControlName="foto"
-                        [class.invalid-input]="formPacienteEnviado && formularioPaciente.get('foto')?.invalid"
+                        id="fotoAdmin"
+                        [class.invalid-input]="formAdministradorEnviado && formularioAdministrador.get('foto')?.invalid"
                     >
+                </div>
+
+                <div class="fila-arriba">
+                    <div class="contenedor-input">
+                        <input [ngModelOptions]="{standalone: true}" type="text" class="form-control"
+                        [(ngModel)]="captchaEscrito" (input)="validarCaptcha()"
+                        [ngClass]="{'is-invalid': !captchaValido, 'is-valid': captchaValido}"
+                        placeholder="CAPTCHA" style="height: 40%;"/>
+                    </div>
+
+                    <div class="flex-column" style="flex: 1;">
+                        <p class="captcha" style="margin-top: 4.5%;">
+                            {{ captcha }}
+                        </p>
+                    </div>
+
                 </div>
 
                 <input type="submit" class="button button-block" value="Registrar">

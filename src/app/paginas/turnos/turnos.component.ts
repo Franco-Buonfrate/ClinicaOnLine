@@ -1,31 +1,37 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { first } from 'rxjs';
 import { AuthService } from 'src/app/servicios/auth.service';
 import { FirestoreService } from 'src/app/servicios/firestore.service';
-import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-mis-turnos-paciente',
-  templateUrl: './mis-turnos-paciente.component.html',
-  styleUrls: ['./mis-turnos-paciente.component.css']
+  selector: 'app-turnos',
+  templateUrl: './turnos.component.html',
+  styleUrls: ['./turnos.component.css']
 })
-export class MisTurnosPacienteComponent implements OnInit{
+export class TurnosComponent implements OnInit{
   turnos: any;
-  usuario:any;
-
-  palabraBusqueda: string = '';
+  usuario: any;
   turnosFiltrados: any[] = [];
+  palabraBusqueda: string = '';
 
-  constructor(private authServer: AuthService, private firestoreService: FirestoreService){
+
+  constructor(private auth:AuthService, private firestore:FirestoreService, private router:Router){
 
   }
 
   ngOnInit(): void {
-    this.usuario = this.authServer.usuarioActual;    
-    
-    const consulta = this.firestoreService.traerTurnosPaciente().subscribe((turnos:any) => {
-      this.turnos = turnos;
-      this.turnosFiltrados = this.turnos;
-    });
+    this.usuario = this.auth.usuarioActual;
+    if(this.usuario?.tipo == 'admin')
+    {
+      const consulta = this.firestore.traerTodosTurnos().pipe(first()).subscribe((turnos: any) => {
+        this.turnos = turnos;
+        this.turnosFiltrados = this.turnos;
+      });
+    }
+    else{
+      this.router.navigate(['home']);
+    }
   }
 
   filtrarPorCampos() {
@@ -34,14 +40,13 @@ export class MisTurnosPacienteComponent implements OnInit{
       this.turnosFiltrados = [...this.turnos];
     } else {
       const busqueda = this.palabraBusqueda.trim().toLocaleLowerCase();
-      
       for (let i = 0; i < this.turnos.length; i++) {
         const turno = this.turnos[i];
         const fechaBusqueda = this.transformarFechaParaBusqueda(turno.fecha);
         if (
           turno.especialista.nombre.toLocaleLowerCase().includes(busqueda) ||
           turno.especialista.apellido.toLocaleLowerCase().includes(busqueda) ||
-          turno.especialidad.toLocaleLowerCase().includes(busqueda)||
+          turno.especialidad.toLocaleLowerCase().includes(busqueda) ||
           turno.estado.toLocaleLowerCase().includes(busqueda) ||
           turno.paciente.nombre.toLocaleLowerCase().includes(busqueda) ||
           turno.paciente.apellido.toLocaleLowerCase().includes(busqueda) ||
@@ -91,72 +96,8 @@ export class MisTurnosPacienteComponent implements OnInit{
     return rtn;
   }
 
-  async cancelarTurno(turno:any)
+  cancelarTurno(turno:any)
   {
-    await Swal.fire({
-      title: "Esta seguro que desea cancelar el turno?",
-      input: "text",
-      inputLabel: "Ingrese comentario",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si, cancelarlo!",
-      cancelButtonText: "Mejor no",
-      showCancelButton:true,
-      inputValidator: (value) => {
-        if (!value) {
-          return "Tienes que dejar un comentario!";
-        }
-        return null;
-      }
-    }).then((res) => {
-      if(res.isConfirmed)
-      {
-        Swal.fire({
-          title: "Cancelado!",
-          text: "Se ha cancelado el turno con exito.",
-          icon: "success"
-        });
-        this.firestoreService.subirComentario(turno, {comentarioPac:res.value, estado:'cancelado'});
-      }
-    });
-    
-  }
 
-  verResenia(resenia:string)
-  {
-    Swal.fire({
-      title: "El especialista ha comentado!",
-      text: resenia,
-      icon: "info"
-    });
-  }
-
-  async calificar(turno:any){
-    await Swal.fire({
-      title: "Deja un comentario sobre como ha sido la atencion",
-      input: "text",
-      inputLabel: "Ingrese comentario",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Dejar calificacion",
-      cancelButtonText: "Cancelar",
-      showCancelButton:true,
-      inputValidator: (value) => {
-        if (!value) {
-          return "Tienes que dejar un comentario!";
-        }
-        return null;
-      }
-    }).then((res) => {
-      if(res.isConfirmed)
-      {
-        Swal.fire({
-          title: "Calificado!",
-          text: "Se ha califica el turno con exito.",
-          icon: "success"
-        });
-        this.firestoreService.subirComentario(turno, {resenia:res.value});
-      }
-    });
   }
 }

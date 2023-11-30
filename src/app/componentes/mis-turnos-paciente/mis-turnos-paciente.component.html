@@ -24,12 +24,12 @@
           <tr *ngFor="let turno of turnosFiltrados">
             <td>{{turno.fecha.toDate() | date}}</td>
             <td>{{turno.especialidad}}</td>
-            <td>{{turno.especialista.nombre}}</td>
+            <td>{{turno.especialista.nombre}}, {{turno.especialista.apellido}}</td>
             <td>{{turno.estado}}</td>
             <td>
             <button class="btn btn-danger" *ngIf="turno.estado == 'pendiente'" (click)="cancelarTurno(turno)">Cancelar</button> <!-- revisar cuando aparece el boton -->
-            <button class="btn btn-info" *ngIf="turno.resenia">Ver reseña</button>  
-            <button class="btn btn-success" *ngIf="turno.estado == 'realizado'">Calificar</button>  
+            <button class="btn btn-info" *ngIf="turno.comentarioEsp" (click)="verResenia(turno)">Ver comentario</button>  
+            <button class="btn btn-success" *ngIf="turno.estado == 'finalizado' && !turno.resenia" (click)="calificar(turno)">Calificar</button>  
 
             </td>
 
